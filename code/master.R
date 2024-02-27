@@ -3,7 +3,8 @@
 
 rm(list = ls())
 
-library(RSocrata); library(dplyr)
+library(RSocrata) # For getting data
+library(dplyr); library(tidyverse) #For manipulating data
 library(arrow) #For compressing data
 library(here) #For easy root management
 library(ccao); library(assessr) #Assessment packages
