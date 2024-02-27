@@ -61,7 +61,7 @@ a <- nrow(subset(appeals, !is.na(case_no))) # Number of appeals for checking
 residential_assessments <- assessments %>%
   left_join(appeals) %>% # Combine appeal and assessment data
   inner_join(triads) %>% # ID triad for each PIN
-  dplyr::group_by(pin, year) %>% # Want to calculate year of year changes in AV
+  dplyr::group_by(pin) %>% # Want to calculate year of year changes in AV
   dplyr::arrange(year) %>% # Want to calculate year of year changes in AV
   dplyr::mutate( 
     # Encode variables properly
@@ -95,7 +95,7 @@ residential_assessments <- residential_assessments %>%
     , ccao_reduction_flag = (certified_tot < mailed_tot) & !is.na(case_no) 
     , ccao_reduction_amount = (mailed_tot - certified_tot)
     , ccao_reduction_pct = (mailed_tot - certified_tot)/mailed_tot
-    , board_reduction_flag = (board_tot <- certified_tot)
+    , board_reduction_flag = (board_tot < certified_tot)
     , board_reduction_amount = (certified_tot - board_tot)
     , board_reduction_pct = (certified_tot - board_tot)/certified_tot
     , appeal = (!is.na(case_no))
