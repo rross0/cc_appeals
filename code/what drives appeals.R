@@ -151,3 +151,4 @@ b %>%
   ggplot(aes(x = yoy_change_av_pct_ntile, y = ccao_win_rate, color = year)) +
   geom_line() + geom_point()
 # Yes, homes win more often if they have larger increases in AV
+
