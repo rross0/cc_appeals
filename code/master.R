@@ -8,8 +8,11 @@ library(dplyr); library(tidyverse) #For manipulating data
 library(arrow) #For compressing data
 library(here) #For easy root management
 library(ccao); library(assessr) #Assessment packages
-library(ggplot2)
+library(ggplot2); library(ggpubr)
 library(jsonlite); library(stringr)
+library(readxl)
+
+MyColours <- as.character(ccao::ccao_colors)
 
 # ----- Ingest raw data-----
 # This file calls data from the Cook County Open Data Portal
