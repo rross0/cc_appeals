@@ -9,3 +9,22 @@ appeals <- appeals %>%
   dplyr::select(
     pin, year, reason_code1, LONGDESC
   )
+
+# What are the appeal reasons?
+
+reasons <- appeals %>%
+  group_by(reason_code1, LONGDESC, SHORTDESC, year) %>%
+  dplyr::summarise(n = n()) %>%
+  dplyr::filter(grepl("characteristics", LONGDESC))
+
+# 2A, 2
+
+appeals %>%
+  dplyr::filter(
+    reason_code1 %in% c('2A', '2') & year >= 2010
+  ) %>%
+  group_by(year) %>%
+  dplyr::summarise(reductions = n()) %>%
+  ggplot(aes(x = year, y = reductions)) +
+  geom_bar(stat = 'identity') +
+  labs(title = "Successful Residential Appeals", subtitle = "Resulting from Characteristic Errors")
