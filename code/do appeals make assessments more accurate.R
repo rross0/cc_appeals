@@ -41,6 +41,7 @@ b <- read_parquet(here::here("cc_appeals", "big data", "residential_assessments.
 a %>%
   ggplot(aes(x = mailed_pct)) + geom_density()
 
+#---- Categorical -----
 # Graph data using sales in following years
 gd1.1 <- a %>% 
   dplyr::group_by(year, assessment_accuracy) %>%
@@ -152,6 +153,7 @@ g5 <- gd1.4 %>%
   scale_y_continuous(labels = scales::percent_format()) +
   theme(legend.position = 'bottom') 
 
+# Combine
 g6 <- ggpubr::ggarrange(g4, g5, ncol = 2, nrow = 1
                         , common.legend = TRUE
                         , legend="bottom")
@@ -161,77 +163,163 @@ jpeg(file=here::here("cc_appeals", "outputs", "plot2.jpeg"), width = 980, height
 g6
 dev.off()
 
+rm(g1, g2,g3,g4,g5,g6,gd1.1, gd1.2,gd1.3,gd1.4)
 
-
-# More detailed view
-gd2 <- a %>%
-  dplyr::group_by(mailed_error_pct_tile, year) %>%
+#---- Detailed-----
+# More detailed view: plot win rates and amounts of pct deviation
+gd1.1 <- a %>%
+  dplyr::group_by(mailed_pct, year) %>%
+  dplyr::mutate(
+    mailed_pct = round(mailed_pct, 1)
+    , mailed_pct = case_when( # Top code for visiual
+        mailed_pct <= .5 ~ .5
+        , mailed_pct >= 1.5 ~ 1.5
+        , TRUE ~ mailed_pct 
+    )
+  ) %>%
   dplyr::summarise(
     win_rate = mean(ccao_reduction_flag)
-    , mean_reduction_pct = mean(ccao_reduction_pct)
-  ) 
+  ) %>%
+  dplyr::ungroup()
 
-gd2 %>%
-  ggplot(aes(x = mailed_error_pct_tile, y = win_rate, colour  = year)) +
-  geom_point() + geom_line()
-
-gd3 <- a %>%
-  dplyr::filter(year %in% c(seq(2018, 2022, 1))) %>%
-  dplyr::group_by(mailed_error_pct, year) %>%
-  dplyr::summarise(
-    win_rate = mean(ccao_reduction_flag)
-    , mean_reduction_pct = mean(ccao_reduction_pct)
-  ) 
-
-gd3 %>%
-  ggplot(aes(x = mailed_error_pct, y = win_rate, colour  = year)) +
-  geom_point() + geom_line()
-
-
-# Do over-assessed homes win? Using prior year sales as the rubric for over-assessed
-gd2 <- b %>% 
-  dplyr::group_by(year, group) %>%
+gd1.2 <- a %>%
+  dplyr::group_by(mailed_pct, year) %>%
+  dplyr::filter(ccao_reduction_flag) %>%
+  dplyr::mutate(
+    mailed_pct = round(mailed_pct, 1)
+    , mailed_pct = case_when( # Top code for visiual
+      mailed_pct <= .5 ~ .5
+      , mailed_pct >= 1.5 ~ 1.5
+      , TRUE ~ mailed_pct 
+    )
+  ) %>%
   dplyr::summarise(
     properties = n()
-    , ccao_win_rate = mean(ccao_reduction_flag)
     , mean_reduction_pct = mean(ccao_reduction_pct)
-  ) 
+  ) %>% 
+  dplyr::ungroup()
 
-gd2 %>%
-  ggplot(aes(y = ccao_win_rate, x = year, colour = group, fill = group)) +
-  geom_bar(stat = 'identity', position = 'dodge')
+  gd2.1 <- b %>%
+    dplyr::group_by(mailed_pct, year) %>%
+    dplyr::mutate(
+      mailed_pct = round(mailed_pct, 1)
+      , mailed_pct = case_when( # Top code for visiual
+        mailed_pct <= .5 ~ .5
+        , mailed_pct >= 1.5 ~ 1.5
+        , TRUE ~ mailed_pct 
+      )
+    ) %>%
+    dplyr::summarise(
+      win_rate = mean(ccao_reduction_flag)
+    ) %>%
+    dplyr::ungroup()
+  
+  gd2.2 <- b %>%
+    dplyr::group_by(mailed_pct, year) %>%
+    dplyr::filter(ccao_reduction_flag) %>%
+    dplyr::mutate(
+      mailed_pct = round(mailed_pct, 1)
+      , mailed_pct = case_when( # Top code for visiual
+        mailed_pct <= .5 ~ .5
+        , mailed_pct >= 1.5 ~ 1.5
+        , TRUE ~ mailed_pct 
+      )
+    ) %>%
+    dplyr::summarise(
+      properties = n()
+      , mean_reduction_pct = mean(ccao_reduction_pct)
+    ) %>%
+  dplyr::ungroup()
+  
+g1 <- gd1.1 %>%
+  ggplot(aes(x = mailed_pct, y = win_rate, colour  = year)) +
+  geom_point(size = 5) + geom_line(linewidth = 2) +
+  geom_vline(xintercept = 1, linetype = 'dashed') +
+  geom_vline(xintercept = 1.1, linetype = 'solid') +
+  geom_vline(xintercept = 0.9, linetype = 'solid') +
+  theme_minimal() +
+  scale_color_manual(values = c(MyColours)) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Appeal Results Compared to Sales in Succeeding Year"
+    , subtitle = "Appeal Success Rate"
+  ) +
+  ylab("Reduction in AV") +
+  xlab("AV percentage of sale price") 
 
+g2 <- gd1.2 %>%
+  dplyr::filter(mean_reduction_pct > -.1) %>%
+  ggplot(aes(x = mailed_pct, y = mean_reduction_pct, colour  = year)) +
+  geom_point(size = 5) + geom_line(linewidth = 2) +
+  geom_vline(xintercept = 1, linetype = 'dashed') +
+  geom_vline(xintercept = 1.1, linetype = 'solid') +
+  geom_vline(xintercept = 0.9, linetype = 'solid') +
+  theme_minimal() +
+  scale_color_manual(values = c(MyColours)) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_continuous(labels = scales::percent_format()) +
+  labs(
+   subtitle = "Appeal Reduction Percent"
+  ) +
+  ylab("Reduction in AV") +
+  xlab("AV percentage of sale price") 
 
-# Looking at win rates by over, under assessment more granularly   
-gd3 <- a %>%
-  dplyr::filter(year %in% c(seq(2018, 2022, 1))) %>%
-  dplyr::group_by(mailed_error_pct_tile, year) %>%
-  dplyr::summarise(
-    win_rate = mean(ccao_reduction_flag)
-    , mean_reduction = mean()
-  ) 
+# Combine
+g3 <- ggpubr::ggarrange(g1, g2, ncol = 2, nrow = 1
+                        , common.legend = TRUE
+                        , legend="bottom")
 
-gd3 %>%
-  ggplot(aes(x = mailed_error_pct_tile, y = win_rate, colour  = year)) +
-     geom_point() + geom_line()
+# Save the Plot
+jpeg(file=here::here("cc_appeals", "outputs", "plot3.jpeg"), width = 980, height = 760)
+g3
+dev.off()
 
-a %>%
-  dplyr::filter(year %in% c(seq(2018, 2022, 1))) %>%
-  dplyr::group_by(mailed_error_pct, year) %>%
-  dplyr::summarise(
-    win_rate = mean(ccao_reduction_flag)
-  ) %>%
-  ggplot(aes(x = mailed_error_pct, y = win_rate, colour  = year)) +
-  geom_point() + geom_line()
+g4 <- gd2.1 %>%
+  ggplot(aes(x = mailed_pct, y = win_rate, colour  = year)) +
+  geom_point(size = 5) + geom_line(linewidth = 2) +
+  geom_vline(xintercept = 1, linetype = 'dashed') +
+  geom_vline(xintercept = 1.1, linetype = 'solid') +
+  geom_vline(xintercept = 0.9, linetype = 'solid') +
+  theme_minimal() +
+  scale_color_manual(values = c(MyColours)) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Appeal Results Compared to Sales in Preceeding Year"
+    , subtitle = "Appeal Success Rate"
+  ) +
+  ylab("Reduction in AV") +
+  xlab("AV percentage of sale price") 
 
-# Do over-assessed homes win more?
+g5 <- gd2.2 %>%
+  dplyr::filter(mean_reduction_pct > -.1) %>%
+  ggplot(aes(x = mailed_pct, y = mean_reduction_pct, colour  = year)) +
+  geom_point(size = 5) + geom_line(linewidth = 2) +
+  geom_vline(xintercept = 1, linetype = 'dashed') +
+  geom_vline(xintercept = 1.1, linetype = 'solid') +
+  geom_vline(xintercept = 0.9, linetype = 'solid') +
+  theme_minimal() +
+  scale_color_manual(values = c(MyColours)) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_x_continuous(labels = scales::percent_format()) +
+  labs(
+    subtitle = "Appeal Reduction Percent"
+  ) +
+  ylab("Reduction in AV") +
+  xlab("AV percentage of sale price") 
 
-a %>%
-  dplyr::filter(year == 2022) %>%
-  dplyr::group_by(mailed_error_pct_tile) %>%
-  dplyr::summarise(
-    win_rate = mean(ccao_reduction_flag)
-    , win_amount = mean(ccao_reduction_pct)
-  ) %>%
-  ggplot(aes(x = mailed_error_pct_tile, y = win_rate)) +
-  geom_point() + geom_smooth()
+# Combine
+g6 <- ggpubr::ggarrange(g4, g5, ncol = 2, nrow = 1
+                        , common.legend = TRUE
+                        , legend="bottom")
+
+# Save the Plot
+jpeg(file=here::here("cc_appeals", "outputs", "plot4.jpeg"), width = 980, height = 760)
+g6
+dev.off()
+
+rm(g1, g2,g3,g4,g5,g6,gd1.1, gd1.2,gd2.1,gd2.2)
+
+#--- Specific Examples----
+

@@ -12,7 +12,7 @@ library(ggplot2); library(ggpubr)
 library(jsonlite); library(stringr)
 library(readxl)
 
-MyColours <- as.character(ccao::ccao_colors)
+MyColours <- c(as.character(ccao::ccao_colors[1:2]), as.character(ccao::ccao_colors[5:12]))
 
 # ----- Ingest raw data-----
 # This file calls data from the Cook County Open Data Portal

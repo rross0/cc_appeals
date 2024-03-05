@@ -29,3 +29,8 @@ The graph below shows appeal success rates and reduction amounts for properties 
 - Over-assessed properties consistently win larger reductions, except in 2020. 
 
 ![ ](outputs/plot2.jpeg)
+
+More detail
+![ ](outputs/plot3.jpeg)
+
+![ ](outputs/plot4.jpeg)
