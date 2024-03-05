@@ -21,3 +21,12 @@ ggplot() +
   xlim(0.8, 1.2) +
   labs(x = "Ratio", y = "F(x)") +
   theme_minimal()
+
+# Find some chased examples 
+chased_ratios <- ratios %>%
+  dplyr::filter(year == 2022 & (mailed_ratio == 1 | board_ratio == 1)) %>%
+  dplyr::select(pin, mailed_ratio, board_ratio)
+
+chased_sales <-read_parquet(here::here("cc_appeals", "big data", "sales_sample.parquet")) %>%
+  inner_join(chased_ratios)
+
