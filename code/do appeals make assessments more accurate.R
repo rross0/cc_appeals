@@ -10,6 +10,10 @@ a <- read_parquet(here::here("cc_appeals", "big data", "residential_assessments.
     mailed_error_pct = round((mailed_tot * 10 - next_year_sale) / next_year_sale, 1)
     , mailed_error_pct_tile = ntile(mailed_error_pct, n = 20)
     , year = factor(year)
+    , group = cas_when(
+        mailed_error_pct < -.1 ~ "Under-assessed"
+        , TRUE ~ "Over-assessed"
+    )
   ) %>%
   dplyr::filter(between(mailed_error_pct, -.75, .75))
 
@@ -22,6 +26,10 @@ b <- read_parquet(here::here("cc_appeals", "big data", "residential_assessments.
     mailed_error_pct = round((mailed_tot * 10 - next_year_sale) / next_year_sale, 1)
     , mailed_error_pct_tile = ntile(mailed_error_pct, n = 20)
     , year = factor(year)
+    , group = cas_when(
+      mailed_error_pct < -.1 ~ "Under-assessed"
+      , TRUE ~ "Over-assessed"
+    )
   ) %>%
   dplyr::filter(between(mailed_error_pct, -.75, .75))
 
