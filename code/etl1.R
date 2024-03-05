@@ -66,12 +66,6 @@ residential_assessments <- assessments %>%
     , yoy_change_av = mailed_tot - prev_av
     , yoy_change_av_pct = (mailed_tot - prev_av)/ prev_av
   ) 
-b <- nrow(subset(appeals, !is.na(case_no)))
-c <- nrow(subset(residential_assessments, !is.na(case_no)))
-
-# Want to make sure all appeals match to an assessment
-if(a == b){ print("good join")}else{print("Bad join")}; rm(appeals)
-(a - b)/a 
 
 rm(assessments, classes, triads, a, b, c)
 
@@ -79,7 +73,9 @@ rm(assessments, classes, triads, a, b, c)
 # and properties that have a sale in the year after the appeal
 # to simplify matters, I omit properties with multiple sales in any given year
 # from the sales sample
-sales <- read_parquet(here::here("cc_appeals", "big data", "sales_sample.parquet"))  %>%
+sales <- read_parquet(here::here("cc_appeals", "big data", "sales_sample.parquet"))  
+
+sales <- sales %>%
   group_by(pin, year) %>%
   dplyr::summarise(
     sales = n()
@@ -96,7 +92,7 @@ residential_assessments <- residential_assessments %>%
     prior_year_sale = lag(sale_price, n = 1L)
     , next_year_sale = lead(sale_price, n = 1)
   )
-  
+
 rm(sales)
 
 # Taxpayers can only appeal once every three years. We want to isolate the data
