@@ -14,11 +14,14 @@ read.socrata(
 ) %>%
   write_parquet(here::here("cc_appeals", "big data", "appeals.parquet"))
 
-read.socrata(
+a <- read.socrata(
   paste0(
   "https://datacatalog.cookcountyil.gov/resource/nj4t-kc8j.json?$"
   , "select=pin, triad_name where year >2004")
-) %>% 
-  dplyr::distinct(pin, triad_name) %>%
+) 
+
+a %>% 
+  dplyr::distinct(pin, triad_name, neighborhood_code, township_code, census_block_geoid) %>%
   write_parquet(here::here("cc_appeals", "big data", "parcel_triads.parquet"))
 
+rm(a)
