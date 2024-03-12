@@ -6,6 +6,26 @@ date: "`r Sys.Date()`"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+
+library(dplyr)
+```
+
+# Sales adjustment to eliminate time bias
+
+
+![ ](outputs/plot1.sales.jpeg)
+
+```{r, chunk1}
+load(file = "outputs/table1-sales.rda")
+knitr::kable(table1_sales
+             , "simple"
+             ,  caption = "Property sales and adjusted sale prices for 01-01-108-016-0000"
+             , col.names = c("Sale Price", "Sale Date", "Lien Date Price", "Lien Date"
+                           , "Prior Year Price", "Prior Year Date"
+                           , "Following Year Price", "Following Year Date")
+)
+
+
 ```
 
 # Are appeal decisions consistent with sales?
@@ -34,3 +54,7 @@ More detail
 ![ ](outputs/plot3.jpeg)
 
 ![ ](outputs/plot4.jpeg)
+
+# Transparency recommendations
+
+- Make it easier to [re-create the sales sample](https://github.com/rross0/cc_appeals/issues/10) the CCAO uses for ratio studies. 

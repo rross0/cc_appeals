@@ -29,7 +29,7 @@ appeals <- read_parquet(here::here("cc_appeals", "big data", "appeals.parquet"))
 
 # For some reason, some PINs are associated with multiple docket numbers in the same year
 # Example:
-dplyr::filter(appeals, pin %in% c('01011080300000', '03294110580000'))  #¯\_(ツ)_/¯
+dplyr::filter(appeals, pin %in% c('01011080300000', '03294110580000'))  
 
 appeals <- appeals %>%
   dplyr::group_by(pin, year) %>%
