@@ -8,23 +8,29 @@
 # Visual detection of sales chasing
 read_parquet(here::here("cc_appeals", "big data", "ratios.parquet")) %>%
   dplyr::filter(
-    year == 2022 
-    & stage ==  "Mailed by Assessor") %>%
+    year == 2017
+    & stage == "Certified by Board of Reivew") %>%
 ggplot(aes(x = ratio, color = sale)) +
-  stat_ecdf(color = MyColours) +
-  stat_ecdf(aes(certified_ratio), ) +
-  stat_ecdf(aes(board_ratio), color = as.character(ccao::ccao_colors[3])) +
+  stat_ecdf() +
   geom_vline(xintercept = 0.98) +
   geom_vline(xintercept = 1.02) +
-  xlim(0.8, 1.2) +
+  xlim(0.95, 1.1) +
   labs(x = "Ratio", y = "F(x)") +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "bottom") 
+
+read_parquet(here::here("cc_appeals", "big data", "ratios.parquet")) %>%
+  dplyr::filter(
+    year == 2022
+    & between(ratio, .5, 1.5)
+  ) %>%
+  ggplot(aes(x = ratio, color = sale)) +
+  geom_histogram() +
+  facet_grid(
+    rows = vars(stage)
+    , cols = vars(sale))
 
 # Find some chased examples 
-chased_ratios <- ratios %>%
-  dplyr::filter(year == 2022 & (mailed_ratio == 1 | board_ratio == 1)) %>%
-  dplyr::select(pin, mailed_ratio, board_ratio)
-
-chased_sales <-read_parquet(here::here("cc_appeals", "big data", "sales_sample.parquet")) %>%
-  inner_join(chased_ratios)
+chased_ratios <- read_parquet(here::here("cc_appeals", "big data", "ratios.parquet")) %>%
+  dplyr::filter(year == 2022 & ratio == 1 ) 
 
