@@ -11,6 +11,8 @@ library(ccao); library(assessr) #Assessment packages
 library(ggplot2); library(ggpubr)
 library(jsonlite); library(stringr)
 library(readxl)
+library(lubridate) 
+library(mgcv)
 
 MyColours <- c(as.character(ccao::ccao_colors[1:2]), as.character(ccao::ccao_colors[5:12]))
 
@@ -22,14 +24,12 @@ source(here::here("cc_appeals", "code", "ingest.r"))
 }
 
 # This file applies filters to determine which sales to use in the analysis
-source(here::here("cc_appeals", "code", "sales_etl.r"))
-
-# This file combines appeals and assessments, applies filters, and generates 
-# useful variables
-source(here::here("cc_appeals", "code", "etl1.r"))
+# This file also executes a time adjustment to sales
+source(here::here("cc_appeals", "code", "etl_sales.r"))
+source(here::here("cc_appeals", "code", "sales_etl_analysis.r"))
 
 # This file creats a sales sample for ratio analysis
-source(here::here("cc_appeals", "code", "etl2.r"))
+source(here::here("cc_appeals", "code", "etl_ratios.r"))
 
 # This file reports total counts and basic rates for appeals
 source(here::here("cc_appeals", "code", "summarry stats.r"))
