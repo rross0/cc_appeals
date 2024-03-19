@@ -10,20 +10,20 @@ ratios <-
     pin, mailed_tot, certified_tot, board_tot # Assessments at each stage
     , contains("adjusted_sale_price_")) %>%
   dplyr::mutate(
-    mailed_ratio_currentyr = mailed_tot / adjusted_sale_price_2
-    , certified_ratio_currentyr = certified_tot / adjusted_sale_price_2
-    , board_ratio_currentyr = board_tot / adjusted_sale_price_2
+    mailed_ratio_currentyr = mailed_tot * 10 / adjusted_sale_price_2
+    , certified_ratio_currentyr = certified_tot * 10/ adjusted_sale_price_2
+    , board_ratio_currentyr = board_tot * 10/ adjusted_sale_price_2
     # Careful here. adjusted 4 estimated sale price in the future of the sale
     # So matching to assessment gives you a sale price from the past, 
     # adjusted forward
-    , mailed_ratio_prioryr = mailed_tot / adjusted_sale_price_4 
-    , certified_ratio_prioryr = certified_tot / adjusted_sale_price_4
-    , board_ratio_prioryr = board_tot / adjusted_sale_price_4
+    , mailed_ratio_prioryr = mailed_tot * 10/ adjusted_sale_price_4 
+    , certified_ratio_prioryr = certified_tot * 10/ adjusted_sale_price_4
+    , board_ratio_prioryr = board_tot * 10/ adjusted_sale_price_4
     # adjustment three predicted a sale price backwards. 
     # so matching gives you a future year's sale
-    , mailed_ratio_nextyr = mailed_tot / adjusted_sale_price_3
-    , certified_ratio_nextyr = certified_tot / adjusted_sale_price_3
-    , board_ratio_nextyr = board_tot / adjusted_sale_price_3
+    , mailed_ratio_nextyr = mailed_tot * 10/ adjusted_sale_price_3
+    , certified_ratio_nextyr = certified_tot * 10/ adjusted_sale_price_3
+    , board_ratio_nextyr = board_tot * 10/ adjusted_sale_price_3
   ) %>%
   dplyr::select(pin, year, triad_name, township, contains("ratio"), contains("adjusted_sale_price_")) 
 
