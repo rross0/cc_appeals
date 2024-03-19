@@ -3,11 +3,11 @@
 
 a <- read_parquet(here::here("cc_appeals", "big data", "residential_assessments.parquet")) %>%
   dplyr::filter( #get appeals with a sale in the year following appeal
-    appeal & !is.na(next_year_sale) & between(year, 2018, 2023)
+    appeal & !is.na(adjusted_sale_price_4) & between(year, 2018, 2023)
   ) %>%
   dplyr::group_by(year) %>%
   dplyr::mutate(
-    mailed_pct = mailed_tot * 10 / next_year_sale
+    mailed_pct = mailed_tot * 10 / adjusted_sale_price_4
     , mailed_pct_tile = ntile(mailed_pct, n = 10)
     , year = factor(year)
     , assessment_accuracy = case_when(
@@ -20,11 +20,11 @@ a <- read_parquet(here::here("cc_appeals", "big data", "residential_assessments.
 
 b <- read_parquet(here::here("cc_appeals", "big data", "residential_assessments.parquet")) %>%
   dplyr::filter( #get appeals with a sale in the year following appeal
-    appeal & !is.na(prior_year_sale) & between(year, 2018, 2023)
+    appeal & !is.na(adjusted_sale_price_3) & between(year, 2018, 2023)
   ) %>%
   dplyr::group_by(year) %>%
   dplyr::mutate(
-    mailed_pct = round((mailed_tot * 10) / prior_year_sale, 1)
+    mailed_pct = round((mailed_tot * 10) / adjusted_sale_price_3, 1)
     , mailed_pct_tile = ntile(mailed_pct, n = 10)
     , year = factor(year)
     , assessment_accuracy = case_when(

@@ -12,6 +12,7 @@ library(dplyr)
 
 # Sales adjustment to eliminate time bias
 
+Property values are estimated at a specific date - the lien date - by the Cook County Assessor: January 1st of the re-assessment year. When sales are compared to assessments for the purpose of a ratio study, differences between the sales date and the lien date can 
 
 ![ ](outputs/plot1.sales.jpeg)
 

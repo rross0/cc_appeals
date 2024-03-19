@@ -25,14 +25,11 @@ source(here::here("cc_appeals", "code", "ingest.r"))
 
 # This file applies filters to determine which sales to use in the analysis
 # This file also executes a time adjustment to sales
-source(here::here("cc_appeals", "code", "sales_etl.r"))
-
-# This file combines appeals and assessments, applies filters, and generates 
-# useful variables
-source(here::here("cc_appeals", "code", "etl1.r"))
+source(here::here("cc_appeals", "code", "etl_sales.r"))
+source(here::here("cc_appeals", "code", "sales_etl_analysis.r"))
 
 # This file creats a sales sample for ratio analysis
-source(here::here("cc_appeals", "code", "etl2.r"))
+source(here::here("cc_appeals", "code", "etl_ratios.r"))
 
 # This file reports total counts and basic rates for appeals
 source(here::here("cc_appeals", "code", "summarry stats.r"))

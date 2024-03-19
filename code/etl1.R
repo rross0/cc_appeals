@@ -71,30 +71,21 @@ rm(assessments, classes, triads, a, b, c)
 
 # We want to look at properties that have a sale in the year prior to appeal
 # and properties that have a sale in the year after the appeal
-# to simplify matters, I omit properties with multiple sales in any given year
-# from the sales sample
-sales <- read_parquet(here::here("cc_appeals", "big data", "sales_sample.parquet"))  
+load(file = here::here("cc_appeals", "big data", "sales_sample.rda"))  
 
+#Remove properties with multiple sales in one year
 sales <- sales %>%
-  group_by(pin, year) %>%
+  dplyr::group_by(pin, year) %>%
   dplyr::summarise(
-    sales = n()
-  ) %>%
-  dplyr::filter(sales == 1) %>%
-  inner_join(sales, relationship = "one-to-one") 
+    n = n()
+   ) %>%
+  dplyr::filter(n <= 1) %>%
+  inner_join(sales,  relationship = "one-to-one")
 
-residential_assessments <- residential_assessments %>%
-   left_join(sales, relationship = "one-to-one") %>%
-  dplyr::group_by(pin) %>%
-  dplyr::arrange(year) %>%
-  # Calculate lagged and leading sales
-  dplyr::mutate(
-    prior_year_sale = lag(sale_price, n = 1L)
-    , next_year_sale = lead(sale_price, n = 1)
-  )
+residential_assessments <- 
+  right_join(sales, residential_assessments, relationship = "one-to-one") 
 
-rm(sales)
-
+rm(sales, appeals)
 # Taxpayers can only appeal once every three years. We want to isolate the data
 # to those years for those taxpayers
 # Define the years and geographies we want. 2005 was a south triad year
