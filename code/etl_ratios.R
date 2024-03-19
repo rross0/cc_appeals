@@ -4,7 +4,7 @@
 
 ratios <-
   read_parquet(here::here("cc_appeals", "big data", "residential_assessments.parquet")) %>%
-  dplyr::filter(!is.na(adjusted_sale_price_2)) %>%
+  dplyr::filter(!is.na(sale_price)) %>%
   dplyr::group_by(year, triad_name, township) %>%
   dplyr::select(
     pin, mailed_tot, certified_tot, board_tot # Assessments at each stage
@@ -40,6 +40,7 @@ a <- ratios %>%
       , grepl("certified", name) ~ "Certified by Assessor"
       , grepl("board", name) ~ "Certified by Board of Reivew"
     )
+    , stage = factor(stage, levels = c("Mailed by Assessor", "Certified by Assessor" , "Certified by Board of Reivew"))
     , sale = case_when(
       grepl("currentyr", name)  ~ "Reassessment year"
       , grepl("prioryr", name) ~ "Year prior to reassessment year"
